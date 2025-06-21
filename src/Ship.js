@@ -1,27 +1,31 @@
-export class Ship{
-    #length;
-    #sunk
-    #hits
+export class Ship {
+  #length;
+  #sunk;
+  #hits;
 
-    constructor(length){
-        this.#length = length;
-        this.#hits = 0;
-        this.#sunk = false;
-    }
+  constructor(length) {
+    this.#length = length;
+    this.#hits = 0;
+    this.#sunk = false;
+  }
 
-    hit(){
-        this.#hits++;
-    }
+  hit() {
+    this.#hits++;
+  }
 
-    isSunk(){
-        return this.#sunk;
-    }
+  isSunk() {
+    return this.#sunk;
+  }
 
-    getHits(){
-        return this.#hits;
-    }
+  getHits() {
+    return this.#hits;
+  }
 
-    sinkShip(){
-        this.#sunk = true;
-    }
+  sinkShip() {
+    this.#sunk = true;
+  }
+
+  getLength() {
+    return this.#length;
+  }
 }

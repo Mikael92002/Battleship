@@ -1,4 +1,5 @@
 import { Gameboard } from "./Gameboard.js";
+import { Ship } from "./Ship.js";
 
 const mockCallback = jest.fn((x) => {
   return x;
@@ -9,7 +10,7 @@ test("should return proper grid numbers", () => {
 
   gameBoard.gridCallBack(mockCallback);
 
-  expect(mockCallback.mock.results[8].value).toStrictEqual([0, 8, false]);
+  expect(mockCallback.mock.results[8].value).toStrictEqual([0, 8, null]);
 });
 
 test("should return coordinates as occupied", () => {
@@ -19,7 +20,8 @@ test("should return coordinates as occupied", () => {
   expect(gameBoard.OccupiedCoordinates([0, 0])).toBe(false);
 
   // y case:
-  gameBoard.placeShip(4, "y", [0, 0]);
+  let ship = new Ship(4);
+  gameBoard.placeShip(ship, "y", [0, 0]);
 
   // Check if coordinates are now occupied:
   expect(gameBoard.OccupiedCoordinates([0, 0])).toBe(true);
@@ -31,7 +33,7 @@ test("should return coordinates as occupied", () => {
   expect(gameBoard.OccupiedCoordinates([1, 0])).toBe(false);
 
   // x case:
-  gameBoard.placeShip(4, "x", [2, 2]);
+  gameBoard.placeShip(ship, "x", [2, 2]);
 
   expect(gameBoard.OccupiedCoordinates([2, 2])).toBe(true);
   expect(gameBoard.OccupiedCoordinates([3, 2])).toBe(true);
@@ -43,9 +45,7 @@ test("should return correct coordinates", () => {
   const gameBoard = new Gameboard();
   let index = gameBoard.coordinatesToIndex([0, 9]);
 
-  expect(gameBoard.getGrid()[index]).toStrictEqual([0, 9, false]);
+  expect(gameBoard.getGrid()[index]).toStrictEqual([0, 9, null]);
 });
 
-test("attack hits ship", () => {
-    
-});
+test("attack hits ship", () => {});
