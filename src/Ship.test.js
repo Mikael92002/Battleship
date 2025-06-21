@@ -1,7 +1,9 @@
 import { Ship } from "./Ship.js";
 
+
+
 test("should return correct hit count", () => {
-  const ship = new Ship(4);
+   const ship = new Ship(4);
 
   ship.hit();
   expect(ship.getHits()).toBe(1);
@@ -13,5 +15,9 @@ test("should return correct hit count", () => {
 });
 
 test("should sink ship", ()=>{
-    
+const ship = new Ship(4);
+
+ship.sinkShip();
+
+expect(ship.isSunk).toBeTruthy();
 })
