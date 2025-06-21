@@ -48,4 +48,21 @@ test("should return correct coordinates", () => {
   expect(gameBoard.getGrid()[index]).toStrictEqual([0, 9, null]);
 });
 
-test("attack hits ship", () => {});
+test("attack hits ship", () => {
+  const gameBoard = new Gameboard();
+
+  let ship = new Ship(4);
+  gameBoard.placeShip(ship, "x", [0, 0]);
+  gameBoard.receiveAttack([0, 0]);
+
+  expect(gameBoard.OccupiedCoordinates([0, 0])).toBe(false);
+});
+
+test("cannot hit same place twice", () => {
+  const gameBoard = new Gameboard();
+
+  let ship = new Ship(4);
+  gameBoard.placeShip(ship, "x", [0, 0]);
+  gameBoard.receiveAttack([0, 0]);
+  expect(gameBoard.receiveAttack([0, 0])).toBe(-1);
+});
