@@ -10,11 +10,13 @@ export class Ship {
   }
 
   hit() {
-    this.#hits++;
+    if (this.#hits < this.#length) {
+      this.#hits++;
+    }
   }
 
   isSunk() {
-    return this.#sunk;
+    return this.#hits === this.#length;
   }
 
   getHits() {

@@ -3,9 +3,11 @@ import { Ship } from "./Ship.js";
 export class Gameboard {
   #grid;
   #coordinatesHit;
+  #shipArray;
 
   constructor() {
     this.#grid = [];
+    this.#shipArray = [];
     this.#coordinatesHit = [];
 
     for (let i = 0; i < 10; i++) {
@@ -19,9 +21,11 @@ export class Gameboard {
     return this.#grid;
   }
 
+  // INDEX VALIDATION NEEDED!!!
   placeShip(ship, orientation, coordinates) {
     //convert coordinates to index:
     let index = this.coordinatesToIndex(coordinates);
+    this.#shipArray.push(ship);
 
     if (orientation === "x") {
       for (let i = ship.getLength(); i > 0; i--) {
@@ -45,12 +49,14 @@ export class Gameboard {
       this.#grid[index][2].hit();
       this.#grid[index][2] = null;
       this.#coordinatesHit.push(coordinates);
+      return "hit!";
     } else {
       this.#coordinatesHit.push(coordinates);
+      return "miss!";
     }
   }
 
-  OccupiedCoordinates(coordinates) {
+  occupiedCoordinates(coordinates) {
     // convert coordinates to index:
     let index = this.coordinatesToIndex(coordinates);
     if (this.#grid[index][2] instanceof Ship) return true;
