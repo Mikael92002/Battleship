@@ -21,20 +21,42 @@ export class Gameboard {
     return this.#grid;
   }
 
-  // INDEX VALIDATION NEEDED!!!
   placeShip(ship, orientation, coordinates) {
     //convert coordinates to index:
     let index = this.coordinatesToIndex(coordinates);
     this.#shipArray.push(ship);
 
     if (orientation === "x") {
+      // check to see if index out of bounds:
+      if (ship.getLength() + coordinates[0] > 9) {
+        return "OOB";
+      }
+      // check to see if ship already present:
+      let copyCoords = coordinates.slice();
+      for (let i = ship.getLength(); i > 0; i--) {
+        if (this.occupiedCoordinates(copyCoords)) return "occupied";
+        copyCoords[0] += 1;
+      }
+      let coordArray = [];
       for (let i = ship.getLength(); i > 0; i--) {
         this.#grid[index][2] = ship;
+        coordArray.push(index);
         index = index + 10;
       }
+      return coordArray;
     } else if (orientation === "y") {
+      if (ship.getLength() + coordinates[1] > 9) {
+        return "OOB";
+      }
+      let copyCoords = coordinates.slice();
+      for (let i = ship.getLength(); i > 0; i--) {
+        if (this.occupiedCoordinates(copyCoords)) return "occupied";
+        copyCoords[1] += 1;
+      }
+      let coordArray = [];
       for (let i = ship.getLength(); i > 0; i--) {
         this.#grid[index][2] = ship;
+        coordArray.push(index);
         index++;
       }
     }

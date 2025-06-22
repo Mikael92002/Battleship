@@ -41,6 +41,35 @@ test("should return coordinates as occupied", () => {
   expect(gameBoard.occupiedCoordinates([5, 2])).toBe(true);
 });
 
+test("does not allow ship to be placed if coords already occupied", () => {
+  let gameBoard = new Gameboard();
+  let carrier = new Ship(5);
+  let destroyer = new Ship(2);
+  expect(gameBoard.placeShip(carrier, "x", [0, 0])).toBe(undefined);
+  expect(gameBoard.placeShip(destroyer, "x", [1, 0])).toBe("occupied");
+});
+
+test("should return coordinates out of bound", () => {
+  let gameBoard = new Gameboard();
+  let ship = new Ship(4);
+
+  // x overflow:
+  let placement = gameBoard.placeShip(ship, "x", [9, 0]);
+  expect(placement).toBe("OOB");
+
+  // x edge case:
+  placement = gameBoard.placeShip(ship, "x", [5, 0]);
+  expect(placement).toBe(undefined);
+
+  // y overflow:
+  placement = gameBoard.placeShip(ship, "y", [0, 9]);
+  expect(placement).toBe("OOB");
+
+  // y edge case:
+  placement = gameBoard.placeShip(ship, "y", [0, 5]);
+  expect(placement).toBe(undefined);
+});
+
 test("should return correct coordinates", () => {
   const gameBoard = new Gameboard();
   let index = gameBoard.coordinatesToIndex([0, 9]);
@@ -59,16 +88,16 @@ test("attack hits ship", () => {
   expect(gameBoard.occupiedCoordinates([0, 0])).toBe(false);
 });
 
-test("attack misses ship", ()=>{
-    const gameBoard = new Gameboard();
-    
-    let ship = new Ship(4);
-    gameBoard.placeShip(ship, "x", [0,0]);
-    let miss = gameBoard.receiveAttack([0,1]);
+test("attack misses ship", () => {
+  const gameBoard = new Gameboard();
 
-    expect(miss).toBe("miss!");
-    expect(gameBoard.occupiedCoordinates([0,0])).toBe(true);
-})
+  let ship = new Ship(4);
+  gameBoard.placeShip(ship, "x", [0, 0]);
+  let miss = gameBoard.receiveAttack([0, 1]);
+
+  expect(miss).toBe("miss!");
+  expect(gameBoard.occupiedCoordinates([0, 0])).toBe(true);
+});
 
 test("cannot hit same place twice", () => {
   const gameBoard = new Gameboard();
