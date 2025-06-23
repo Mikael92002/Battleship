@@ -1,15 +1,14 @@
-import {view} from "./view.js";
+import { Player } from "./Player.js";
+import { view } from "./view.js";
 
-export class Controller{
-    playerOne;
-    playerTwo;
-    view;
+export class Controller {
+  model;
+  view;
 
-    constructor(playerOne, playerTwo, view){
-        this.view = view;
-        this.playerOne = playerOne;
-        this.playerTwo = playerTwo;
-    }
+  constructor(model, view) {
+    this.view = view;
+    this.model = model;
 
     
+  }
 }

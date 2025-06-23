@@ -23,12 +23,6 @@ export class Player {
     // for now, place ships on random
     //  co-ords:
     this.shipsPlaced = false;
-    this.gameBoard.placeShip(this.carrier,"x",[0,0]);
-    this.gameBoard.placeShip(this.battleship,"x",[0,1]);
-    this.gameBoard.placeShip(this.cruiser,"y",[9,0]);
-    this.gameBoard.placeShip(this.submarine, "x", [0,2]);
-    this.gameBoard.placeShip(this.destroyer, "x", [0,3]);
-    this.shipsPlaced = true;
   }
 
 

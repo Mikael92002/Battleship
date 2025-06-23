@@ -18,10 +18,6 @@ export class View {
 
         otherSquareDiv.classList.add("enemy-grid-square");
 
-        squareDiv.addEventListener("mouseover", (x) => {
-          this.highlightSquare(4, x.target, "y");
-        });
-
         squareDiv.addEventListener("mouseleave", this.resetSquareColor);
 
         this.playerOneGrid.append(squareDiv);
