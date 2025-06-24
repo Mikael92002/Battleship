@@ -59,6 +59,7 @@ export class Gameboard {
         coordArray.push(index);
         index++;
       }
+      return coordArray;
     }
   }
 
@@ -108,6 +109,12 @@ export class Gameboard {
   gridCallBack(callback) {
     for (let i = 0; i < this.#grid.length; i++) {
       callback(this.#grid[i]);
+    }
+  }
+
+  gridToString() {
+    for (let element of this.#grid) {
+       console.log(element);
     }
   }
 }

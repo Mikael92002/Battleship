@@ -13,8 +13,8 @@ export class View {
 
         squareDiv.classList.add("grid-square");
         squareDiv.setAttribute("data-index", i * 10 + j);
-        squareDiv.setAttribute("data-x", i);
-        squareDiv.setAttribute("data-y", j);
+        squareDiv.setAttribute("data-x", j);
+        squareDiv.setAttribute("data-y", 9-i);
 
         otherSquareDiv.classList.add("enemy-grid-square");
 
@@ -49,7 +49,9 @@ export class View {
     let allSquares = document.querySelectorAll(".grid-square");
 
     for (let square of allSquares) {
-      square.style.borderColor = "#F27DFD";
+      if (!square.hasAttribute("data-placed")) {
+        square.style.borderColor = "#F27DFD";
+      }
     }
   }
 
@@ -87,5 +89,9 @@ export class View {
       element.style.borderColor = "#39FF14";
       tempIndex -= 10;
     }
+  }
+
+  highlightSquareTemp(){
+
   }
 }
