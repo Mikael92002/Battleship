@@ -8,10 +8,17 @@ export class Player {
   cruiser;
   submarine;
   destroyer;
+  #shipQ;
   turn;
-  shipsPlaced;
+//   shipsPlaced;
 
-  constructor(carrierPOS, battleshipPOS, cruiserPOS, submarinePOS, destroyerPOS) {
+  constructor(
+    carrierPOS,
+    battleshipPOS,
+    cruiserPOS,
+    submarinePOS,
+    destroyerPOS
+  ) {
     this.turn = false;
     this.gameBoard = new Gameboard();
     this.carrier = new Ship(5);
@@ -19,11 +26,34 @@ export class Player {
     this.cruiser = new Ship(3);
     this.submarine = new Ship(3);
     this.destroyer = new Ship(2);
+    
+    this.#shipQ = [];
+    this.#shipQ.push(
+      this.carrier,
+      this.battleship,
+      this.cruiser,
+      this.submarine,
+      this.destroyer
+    );
 
     // for now, place ships on random
     //  co-ords:
-    this.shipsPlaced = false;
+    // this.shipsPlaced = false;
   }
 
+  popShips() {
+    if (this.#shipQ.length > 0) {
+      return this.#shipQ.shift();
+    }
+  }
 
+  peekShip(){
+    if(this.#shipQ.length > 0){
+        return this.#shipQ[0];
+    }
+  }
+
+  shipArrSize(){
+    return this.#shipQ.length;
+  }
 }

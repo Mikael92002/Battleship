@@ -18,7 +18,7 @@ export class View {
 
         otherSquareDiv.classList.add("enemy-grid-square");
 
-        squareDiv.addEventListener("mouseleave", this.resetSquareColor);
+        // squareDiv.addEventListener("mouseleave", this.resetSquareColor);
 
         this.playerOneGrid.append(squareDiv);
         this.playerTwoGrid.append(otherSquareDiv);
