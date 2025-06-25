@@ -67,9 +67,9 @@ export class View {
     let allSquares = document.querySelectorAll(".grid-square");
 
     for (let square of allSquares) {
-      if (!square.hasAttribute("data-placed")) {
+      
         square.style.borderColor = "#F27DFD";
-      }
+      
     }
   }
 
@@ -121,9 +121,9 @@ export class View {
         let gridSquare = document.querySelector(
           `.grid-square[data-index="${index}"]`
         );
-        if (!gridSquare.hasAttribute("data-placed")) {
+        
           gridSquare.style.borderColor = color;
-        }
+        
 
         index++;
       }
@@ -132,9 +132,8 @@ export class View {
         let gridSquare = document.querySelector(
           `.grid-square[data-index="${index}"]`
         );
-        if (!gridSquare.hasAttribute("data-placed")) {
             gridSquare.style.borderColor = color;
-          }
+          
         index -= 10;
       }
     }
@@ -147,7 +146,7 @@ export class View {
         let gridSquare = document.querySelector(
           `.grid-square[data-index="${index}"]`
         );
-        gridSquare.style.borderColor = color;
+        gridSquare.style.backgroundColor = color;
         gridSquare.setAttribute("data-placed", "true");
         index++;
       }
@@ -157,7 +156,7 @@ export class View {
           `.grid-square[data-index="${index}"]`
         );
         gridSquare.setAttribute("data-placed", "true");
-        gridSquare.style.borderColor = color;
+        gridSquare.style.backgroundColor = color;
         index -= 10;
       }
     }
