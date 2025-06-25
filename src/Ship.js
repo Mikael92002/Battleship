@@ -6,7 +6,6 @@ export class Ship {
   constructor(length) {
     this.#length = length;
     this.#hits = 0;
-    this.#sunk = false;
   }
 
   hit() {
@@ -21,10 +20,6 @@ export class Ship {
 
   getHits() {
     return this.#hits;
-  }
-
-  sinkShip() {
-    this.#sunk = true;
   }
 
   getLength() {

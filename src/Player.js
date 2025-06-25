@@ -9,8 +9,7 @@ export class Player {
   submarine;
   destroyer;
   #shipQ;
-  turn;
-//   shipsPlaced;
+  shipsPlaced;
 
   constructor(
     carrierPOS,
@@ -19,7 +18,6 @@ export class Player {
     submarinePOS,
     destroyerPOS
   ) {
-    this.turn = false;
     this.gameBoard = new Gameboard();
     this.carrier = new Ship(5);
     this.battleship = new Ship(4);
@@ -36,9 +34,7 @@ export class Player {
       this.destroyer
     );
 
-    // for now, place ships on random
-    //  co-ords:
-    // this.shipsPlaced = false;
+    this.shipsPlaced = false;
   }
 
   popShips() {

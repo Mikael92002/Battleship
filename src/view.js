@@ -19,6 +19,8 @@ export class View {
         squareDiv.setAttribute("data-y", 9 - i);
 
         otherSquareDiv.classList.add("enemy-grid-square");
+        otherSquareDiv.setAttribute("data-opp-x", j);
+        otherSquareDiv.setAttribute("data-opp-y", 9 - i);
 
         this.playerOneGrid.append(squareDiv);
         this.playerTwoGrid.append(otherSquareDiv);
@@ -42,7 +44,6 @@ export class View {
     });
   }
 
-  // USE COORDINATES TO HIGHLIGHT SQUARE INSTEAD OF INDEXING
 
   highlightSquare(shipLength, squareToHighlightFrom, orientation) {
     let index = squareToHighlightFrom.getAttribute("data-index");
@@ -67,9 +68,7 @@ export class View {
     let allSquares = document.querySelectorAll(".grid-square");
 
     for (let square of allSquares) {
-      
-        square.style.borderColor = "#F27DFD";
-      
+      square.style.borderColor = "#F27DFD";
     }
   }
 
@@ -92,9 +91,7 @@ export class View {
   invalidYIndex(index) {
     let tempIndex = index;
     for (let i = 0; i < index / 10; i++) {
-      let element = document.querySelector(
-        `div[data-index = "${Number(tempIndex)}"]`
-      );
+      let element = document.querySelector(`div[data-index = "${Number(tempIndex)}"]`);
       element.style.borderColor = "#FF0000";
       tempIndex -= 10;
     }
@@ -118,22 +115,17 @@ export class View {
     let index = squareToHighlightFrom.getAttribute("data-index");
     if (orientation === "x") {
       for (let i = 0; i < howMany; i++) {
-        let gridSquare = document.querySelector(
-          `.grid-square[data-index="${index}"]`
-        );
-        
-          gridSquare.style.borderColor = color;
-        
+        let gridSquare = document.querySelector(`.grid-square[data-index="${index}"]`);
+
+        gridSquare.style.borderColor = color;
 
         index++;
       }
     } else if (orientation === "y") {
       for (let i = 0; i < howMany; i++) {
-        let gridSquare = document.querySelector(
-          `.grid-square[data-index="${index}"]`
-        );
-            gridSquare.style.borderColor = color;
-          
+        let gridSquare = document.querySelector(`.grid-square[data-index="${index}"]`);
+        gridSquare.style.borderColor = color;
+
         index -= 10;
       }
     }
@@ -143,18 +135,14 @@ export class View {
     let index = squareToHighlightFrom.getAttribute("data-index");
     if (orientation === "x") {
       for (let i = 0; i < howMany; i++) {
-        let gridSquare = document.querySelector(
-          `.grid-square[data-index="${index}"]`
-        );
+        let gridSquare = document.querySelector(`.grid-square[data-index="${index}"]`);
         gridSquare.style.backgroundColor = color;
         gridSquare.setAttribute("data-placed", "true");
         index++;
       }
     } else if (orientation === "y") {
       for (let i = 0; i < howMany; i++) {
-        let gridSquare = document.querySelector(
-          `.grid-square[data-index="${index}"]`
-        );
+        let gridSquare = document.querySelector(`.grid-square[data-index="${index}"]`);
         gridSquare.setAttribute("data-placed", "true");
         gridSquare.style.backgroundColor = color;
         index -= 10;

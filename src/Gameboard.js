@@ -141,4 +141,13 @@ export class Gameboard {
       console.log(element);
     }
   }
+
+  allShipsSunk(){
+    for(let ship of this.#shipArray){
+        if(!ship.isSunk()){
+            return false;
+        }
+    }
+    return true;
+  }
 }
