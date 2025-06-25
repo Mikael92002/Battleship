@@ -4,15 +4,18 @@ export class Gameboard {
   #grid;
   #coordinatesHit;
   #shipArray;
+  possibleOppAttacks;
 
   constructor() {
     this.#grid = [];
     this.#shipArray = [];
     this.#coordinatesHit = [];
+    this.possibleOppAttacks = [];
 
     for (let i = 0; i < 10; i++) {
       for (let j = 0; j < 10; j++) {
         this.#grid.push([i, j, null]);
+        this.possibleOppAttacks.push([i, j]);
       }
     }
   }
@@ -142,11 +145,11 @@ export class Gameboard {
     }
   }
 
-  allShipsSunk(){
-    for(let ship of this.#shipArray){
-        if(!ship.isSunk()){
-            return false;
-        }
+  allShipsSunk() {
+    for (let ship of this.#shipArray) {
+      if (!ship.isSunk()) {
+        return false;
+      }
     }
     return true;
   }

@@ -68,18 +68,20 @@ export class Controller {
           if (attack === "hit!") {
             this.helpText.textContent = "You hit the opponent's ship!";
             event.target.style.backgroundColor = "#39FF14";
-            if(this.model.playerTwo.gameBoard.allShipsSunk()){
-                this.helpText.textContent = "YOU WIN!!!";
+            if (this.model.playerTwo.gameBoard.allShipsSunk()) {
+              this.helpText.textContent = "YOU WIN!!!";
             }
           }
           if (attack === "miss!") {
             this.helpText.textContent = "You missed the opponent's ships!";
-            event.target.style.backgroundColor = "#FF0000"
+            event.target.style.backgroundColor = "#FF0000";
           }
 
           this.currentPlayer = this.model.playerTwo;
           //opponent does their move;
           // ...
+          this.opponentAttackAlgorithm();
+
           this.currentPlayer = this.model.playerOne;
         }
       }
@@ -138,7 +140,6 @@ export class Controller {
             coordValidation = this.model.playerTwo.gameBoard.validateCoordinates(currShip, [randomX, randomY], orient);
           }
           this.model.playerTwo.gameBoard.placeShip(currShip, orient, [randomX, randomY]);
-          this.model.playerTwo.gameBoard.gridToString();
         }
         resolve("success");
       }, 2000);
@@ -156,5 +157,34 @@ export class Controller {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  opponentAttackAlgorithm() {
+    let attack = new Promise((resolve) => {
+      setTimeout(() => {
+        // initially, randomly select square to find ship:
+        let randIndex = this.getRandomIntInclusive(0, this.model.playerTwo.gameBoard.possibleOppAttacks.length - 1);
+
+        let attackCoords = this.model.playerTwo.gameBoard.possibleOppAttacks[randIndex];
+        this.model.playerTwo.gameBoard.possibleOppAttacks.splice(randIndex, 1);
+        console.log(this.model.playerTwo.gameBoard.possibleOppAttacks);
+
+        let attack = this.model.playerOne.gameBoard.receiveAttack(attackCoords);
+
+        // change color:
+        this.changePlayerOneColor(attackCoords);
+        resolve(attack);
+
+      }, 1500);
+    });
+    attack.then((val) => {
+        this.helpText.textContent = (val === "hit") ? "The opponent hits!":"The opponent misses!";
+    });
+  }
+
+  changePlayerOneColor(coords) {
+    let squareDiv = document.querySelector(`.grid-square[data-x = "${coords[0]}"][data-y = "${coords[1]}"]`);
+    console.log(squareDiv);
+    squareDiv.style.backgroundColor = "#FF0000";
   }
 }
