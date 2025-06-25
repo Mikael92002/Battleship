@@ -13,60 +13,83 @@ export class Controller {
     this.playerOneGrid = document.querySelector("#player-1-grid");
 
     this.playerOneGrid.addEventListener("mouseover", (x) => {
-      if (x.target.classList.contains("grid-square")) {
-        this.highlightingSquares(x.target, "x");
+      if (this.model.playerOne.shipArrSize() > 0) {
+        if (x.target.classList.contains("grid-square")) {
+
+          let activeButtonText = document.querySelector(".active").textContent.toLowerCase();
+          let xCoord = Number(x.target.getAttribute("data-x"));
+          let yCoord = Number(x.target.getAttribute("data-y"));
+          let coordValidation = this.model.playerOne.gameBoard.validateCoordinates(this.model.playerOne.peekShip(), [xCoord, yCoord], activeButtonText);
+
+          if (activeButtonText === "x") {
+            if (coordValidation === "valid") {
+              this.view.highlightMultipleSquares(this.model.playerOne.peekShip().getLength(), x.target, "x", "#39FF14");
+            } else if (coordValidation === "OOB") {
+              this.view.highlightMultipleSquares(10 - xCoord, x.target, "x", "#FF0000");
+            } else if (coordValidation === "occupied") {
+              this.view.highlightMultipleSquares(this.model.playerOne.peekShip().getLength(), x.target, "x", "#FF0000");
+            }
+          } else if (activeButtonText === "y") {
+            if (coordValidation === "valid") {
+              this.view.highlightMultipleSquares(this.model.playerOne.peekShip().getLength(), x.target, "y", "#39FF14");
+            } else if (coordValidation === "OOB") {
+              this.view.highlightMultipleSquares(10 - yCoord, x.target, "y", "#FF0000");
+            } else if (coordValidation === "occupied") {
+              this.view.highlightMultipleSquares(this.model.playerOne.peekShip().getLength(), x.target, "y", "#FF0000");
+            }
+          }
+
+        }
       }
     });
 
     this.playerOneGrid.addEventListener("mouseout", this.view.resetSquareColor);
 
     this.playerOneGrid.addEventListener("click", (x) => {
-      if (x.target.classList.contains("grid-square")) {
-        // this.highlightingSquares(x.target, "x");
-        let coordArray = this.clickedSquare(x.target, "x");
-        x.target.setAttribute("data-placed", true);
-        this.view.resetSquareColor();
+      if (this.model.playerOne.shipArrSize() > 0) {
+        if (x.target.classList.contains("grid-square")) {
+          let activeButtonText = document.querySelector(".active").textContent.toLowerCase();
+
+          let xCoord = Number(x.target.getAttribute("data-x"));
+          let yCoord = Number(x.target.getAttribute("data-y"));
+
+          let coordValidation = this.model.playerOne.gameBoard.validateCoordinates(this.model.playerOne.peekShip(), [xCoord, yCoord], activeButtonText);
+
+          if (coordValidation === "valid") {
+            if (this.model.playerOne.shipArrSize() > 0) {
+              let poppedShip = this.model.playerOne.popShips();
+
+              this.model.playerOne.gameBoard.placeShip(poppedShip, activeButtonText, [xCoord, yCoord]);
+              this.view.placeShipClick(poppedShip.getLength(), x.target, activeButtonText);
+            }
+          }
+        }
       }
     });
-
-    // this.playerOneGrid.addEventListener("click", (x)=>{
-    //
-    // })
-  }
-
-  highlightingSquares(target, orientation) {
-    if (this.model.playerOne.shipArrSize() > 0) {
-      this.view.highlightSquare(
-        this.model.playerOne.peekShip().getLength(),
-        target,
-        orientation
-      );
-    }
-  }
-
-  clickedSquare(target, orientation) {
-    if (this.model.playerOne.shipArrSize() > 0) {
-      let ship = this.model.playerOne.popShips();
-
-      let returnVal = this.model.playerOne.gameBoard.placeShip(ship, "x", [
-        Number(target.getAttribute("data-x")),
-        Number(target.getAttribute("data-y")),
-      ]);
-
-      this.model.playerOne.gameBoard.gridToString();
-
-      this.highlightingSquares(target, orientation);
-      if (Array.isArray(returnVal)) {
-        let coordArray = [];
-        for (let i = 0; i < returnVal.length; i++) {
-          coordArray.push(this.indexToCoords(returnVal[i]));
-        }
-        return coordArray;
-      }
-    }
   }
 
   occupiedCoordinatesLoop(target) {}
+
+  highlightCoordValidation(validationMessage, activeButtonText, target){
+    if(activeButtonText === "x"){
+        if (validationMessage === "valid") {
+            this.view.highlightMultipleSquares(this.model.playerOne.peekShip().getLength(), target, "x", "#39FF14");
+          } else if (validationMessage === "OOB") {
+            this.view.highlightMultipleSquares(10 - xCoord, target, "x", "#FF0000");
+          } else if (validationMessage === "occupied") {
+            this.view.highlightMultipleSquares(this.model.playerOne.peekShip().getLength(), target, "x", "#FF0000");
+          }
+    }
+    else if (activeButtonText === "y"){
+        if (validationMessage === "valid") {
+            this.view.highlightMultipleSquares(this.model.playerOne.peekShip().getLength(), target, "y", "#39FF14");
+          } else if (validationMessage === "OOB") {
+            this.view.highlightMultipleSquares(10 - yCoord, target, "y", "#FF0000");
+          } else if (validationMessage === "occupied") {
+            this.view.highlightMultipleSquares(this.model.playerOne.peekShip().getLength(), target, "y", "#FF0000");
+          }
+    }
+  }
 
   indexToCoords(index) {
     let x = index / 10;

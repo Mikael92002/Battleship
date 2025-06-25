@@ -25,23 +25,49 @@ h1 {
 #grid-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr;
+    grid-template-rows: min-content 1fr;
     justify-items: center;
     align-items: center;
     height: 100%;
     column-gap: 10px;
 }
 
-#player-1-grid, #player-2-grid {
+#player-1-grid,
+#player-2-grid {
     display: grid;
-    grid-template-columns: repeat(10,20px);
+    grid-template-columns: repeat(10, 20px);
     grid-auto-rows: 20px;
+    grid-row-start: 2;
 }
 
-.grid-square, .enemy-grid-square {
+.grid-square,
+.enemy-grid-square {
     border: 1px solid #F27DFD;
     display: flex;
     justify-content: center;
     align-items: center;
     line-height: 1px;
+}
+
+#orientation {
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+.x-button,
+.y-button {
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid white;
+    transition: 0.2s;
+}
+.x-button:hover, .y-button:hover{
+    transform: scale(1.08);
+}
+.x-button:active, .y-button:active{
+    opacity: 0.5;
+}
+
+.active {
+    background-color: #F27DFD;
 }

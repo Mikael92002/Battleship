@@ -28,7 +28,7 @@ export class Gameboard {
 
     if (orientation === "x") {
       // check to see if index out of bounds:
-      if (ship.getLength() + coordinates[0] > 9) {
+      if (ship.getLength() + coordinates[0] > 10) {
         return "OOB";
       }
       // check to see if ship already present:
@@ -45,7 +45,7 @@ export class Gameboard {
       }
       return coordArray;
     } else if (orientation === "y") {
-      if (ship.getLength() + coordinates[1] > 9) {
+      if (ship.getLength() + coordinates[1] > 10) {
         return "OOB";
       }
       let copyCoords = coordinates.slice();
@@ -106,6 +106,30 @@ export class Gameboard {
     return false;
   }
 
+  validateCoordinates(ship, coords, orientation) {
+    if (orientation === "x") {
+      // check to see if index out of bounds:
+      if (ship.getLength() + coords[0] > 10) {
+        return "OOB";
+      }
+      let copyCoords = coords.slice();
+      for (let i = ship.getLength(); i > 0; i--) {
+        if (this.occupiedCoordinates(copyCoords)) return "occupied";
+        copyCoords[0] += 1;
+      }
+    } else if (orientation === "y") {
+      if (ship.getLength() + coords[1] > 10) {
+        return "OOB";
+      }
+      let copyCoords = coords.slice();
+      for (let i = ship.getLength(); i > 0; i--) {
+        if (this.occupiedCoordinates(copyCoords)) return "occupied";
+        copyCoords[1] += 1;
+      }
+    }
+    return "valid";
+  }
+
   gridCallBack(callback) {
     for (let i = 0; i < this.#grid.length; i++) {
       callback(this.#grid[i]);
@@ -114,7 +138,7 @@ export class Gameboard {
 
   gridToString() {
     for (let element of this.#grid) {
-       console.log(element);
+      console.log(element);
     }
   }
 }

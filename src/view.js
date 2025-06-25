@@ -1,6 +1,8 @@
 export class View {
   playerOneGrid;
   playerTwoGrid;
+  xButton;
+  yButton;
 
   constructor() {
     this.playerOneGrid = document.querySelector("#player-1-grid");
@@ -14,17 +16,33 @@ export class View {
         squareDiv.classList.add("grid-square");
         squareDiv.setAttribute("data-index", i * 10 + j);
         squareDiv.setAttribute("data-x", j);
-        squareDiv.setAttribute("data-y", 9-i);
+        squareDiv.setAttribute("data-y", 9 - i);
 
         otherSquareDiv.classList.add("enemy-grid-square");
-
-        // squareDiv.addEventListener("mouseleave", this.resetSquareColor);
 
         this.playerOneGrid.append(squareDiv);
         this.playerTwoGrid.append(otherSquareDiv);
       }
     }
+
+    this.xButton = document.querySelector(".x-button");
+    this.yButton = document.querySelector(".y-button");
+
+    this.xButton.addEventListener("click", () => {
+      if (!this.xButton.classList.contains("active")) {
+        this.xButton.classList.add("active");
+        this.yButton.classList.remove("active");
+      }
+    });
+    this.yButton.addEventListener("click", () => {
+      if (!this.yButton.classList.contains("active")) {
+        this.yButton.classList.add("active");
+        this.xButton.classList.remove("active");
+      }
+    });
   }
+
+  // USE COORDINATES TO HIGHLIGHT SQUARE INSTEAD OF INDEXING
 
   highlightSquare(shipLength, squareToHighlightFrom, orientation) {
     let index = squareToHighlightFrom.getAttribute("data-index");
@@ -91,7 +109,57 @@ export class View {
     }
   }
 
-  highlightSquareTemp(){
+  //   highlightSquareTemp(coords, color){
+  //     let gridSquare = document.querySelector(`.grid-square[data-x="${coords[0]}"][data-y="${coords[1]}"]`);
+  //     gridSquare.style.borderColor = color;
+  //     console.log(gridSquare);
+  //   }
+  highlightMultipleSquares(howMany, squareToHighlightFrom, orientation, color) {
+    let index = squareToHighlightFrom.getAttribute("data-index");
+    if (orientation === "x") {
+      for (let i = 0; i < howMany; i++) {
+        let gridSquare = document.querySelector(
+          `.grid-square[data-index="${index}"]`
+        );
+        if (!gridSquare.hasAttribute("data-placed")) {
+          gridSquare.style.borderColor = color;
+        }
 
+        index++;
+      }
+    } else if (orientation === "y") {
+      for (let i = 0; i < howMany; i++) {
+        let gridSquare = document.querySelector(
+          `.grid-square[data-index="${index}"]`
+        );
+        if (!gridSquare.hasAttribute("data-placed")) {
+            gridSquare.style.borderColor = color;
+          }
+        index -= 10;
+      }
+    }
+  }
+
+  placeShipClick(howMany, squareToHighlightFrom, orientation, color) {
+    let index = squareToHighlightFrom.getAttribute("data-index");
+    if (orientation === "x") {
+      for (let i = 0; i < howMany; i++) {
+        let gridSquare = document.querySelector(
+          `.grid-square[data-index="${index}"]`
+        );
+        gridSquare.style.borderColor = color;
+        gridSquare.setAttribute("data-placed", "true");
+        index++;
+      }
+    } else if (orientation === "y") {
+      for (let i = 0; i < howMany; i++) {
+        let gridSquare = document.querySelector(
+          `.grid-square[data-index="${index}"]`
+        );
+        gridSquare.setAttribute("data-placed", "true");
+        gridSquare.style.borderColor = color;
+        index -= 10;
+      }
+    }
   }
 }

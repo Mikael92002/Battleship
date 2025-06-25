@@ -45,13 +45,13 @@ test("does not allow ship to be placed if coords already occupied", () => {
   let gameBoard = new Gameboard();
   let carrier = new Ship(5);
   let destroyer = new Ship(2);
-  expect(gameBoard.placeShip(carrier, "x", [0, 0])).toBe(undefined);
+  expect(Array.isArray(gameBoard.placeShip(carrier, "x", [0, 0]))).toBe(true);
   expect(gameBoard.placeShip(destroyer, "x", [1, 0])).toBe("occupied");
 });
 
 test("should return coordinates out of bound", () => {
   let gameBoard = new Gameboard();
-  let ship = new Ship(4);
+  let ship = new Ship(5);
 
   // x overflow:
   let placement = gameBoard.placeShip(ship, "x", [9, 0]);
@@ -59,7 +59,7 @@ test("should return coordinates out of bound", () => {
 
   // x edge case:
   placement = gameBoard.placeShip(ship, "x", [5, 0]);
-  expect(placement).toBe(undefined);
+  expect(Array.isArray(placement)).toBe(true);
 
   // y overflow:
   placement = gameBoard.placeShip(ship, "y", [0, 9]);
@@ -67,7 +67,7 @@ test("should return coordinates out of bound", () => {
 
   // y edge case:
   placement = gameBoard.placeShip(ship, "y", [0, 5]);
-  expect(placement).toBe(undefined);
+  expect(Array.isArray(placement)).toBe(true);
 });
 
 test("should return correct coordinates", () => {
