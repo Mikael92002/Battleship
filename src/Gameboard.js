@@ -153,4 +153,14 @@ export class Gameboard {
     }
     return true;
   }
+
+  remainingShips(){
+    let count = 0;
+    for(let ship of this.#shipArray){
+      if(!ship.isSunk()){
+        count++;
+      }
+    }
+    return count;
+  }
 }

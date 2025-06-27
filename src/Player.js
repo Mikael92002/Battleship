@@ -9,7 +9,7 @@ export class Player {
   submarine;
   destroyer;
   #shipQ;
-  shipsPlaced;
+  possibleAttacksQ;
 
   constructor(
     carrierPOS,
@@ -33,8 +33,6 @@ export class Player {
       this.submarine,
       this.destroyer
     );
-
-    this.shipsPlaced = false;
   }
 
   popShips() {

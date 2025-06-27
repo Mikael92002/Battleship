@@ -1,5 +1,6 @@
 import { Player } from "./Player.js";
 import { view } from "./view.js";
+import { Ship } from "./Ship.js";
 
 export class Controller {
   model;
@@ -8,11 +9,18 @@ export class Controller {
   playerTwoGrid;
   helpText;
   currentPlayer;
+  winCheck;
+  shipFirstFound;
+  smartNode;
+  secondProtocol;
 
   constructor(model, view) {
     this.view = view;
     this.model = model;
     this.currentPlayer = null;
+    this.winCheck = false;
+    this.shipFirstFound = [];
+    this.smartNode = null;
 
     this.playerOneGrid = document.querySelector("#player-1-grid");
     this.playerTwoGrid = document.querySelector("#player-2-grid");
@@ -46,19 +54,18 @@ export class Controller {
           this.clickValidation(coordValidation, event.target, activeButtonText, [xCoord, yCoord]);
         }
       }
-      if (this.model.playerOne.shipArrSize() === 0 && this.model.playerTwo.shipsPlaced === false) {
+      if (this.model.playerOne.shipArrSize() === 0 && this.model.playerTwo.shipArrSize() > 0) {
         this.helpText.textContent = "Waiting for Opponent to place ships...";
         let startGame = this.placePlayerTwoShips();
         startGame.then((val) => {
           this.helpText.textContent = "Opponent ships placed! Your move...";
-          this.model.playerTwo.shipsPlaced = true;
           this.currentPlayer = this.model.playerOne;
         });
       }
     });
 
     this.playerTwoGrid.addEventListener("click", (event) => {
-      if (this.currentPlayer === this.model.playerOne && this.model.playerTwo.shipsPlaced === true) {
+      if (this.currentPlayer === this.model.playerOne && this.model.playerTwo.shipArrSize() <= 0 && this.winCheck === false) {
         if (event.target.classList.contains("enemy-grid-square")) {
           let xCoord = Number(event.target.getAttribute("data-opp-x"));
           let yCoord = Number(event.target.getAttribute("data-opp-y"));
@@ -68,21 +75,20 @@ export class Controller {
           if (attack === "hit!") {
             this.helpText.textContent = "You hit the opponent's ship!";
             event.target.style.backgroundColor = "#39FF14";
-            if (this.model.playerTwo.gameBoard.allShipsSunk()) {
-              this.helpText.textContent = "YOU WIN!!!";
-            }
+            this.winUpdate(this.model.playerOne);
           }
           if (attack === "miss!") {
             this.helpText.textContent = "You missed the opponent's ships!";
             event.target.style.backgroundColor = "#FF0000";
           }
-
-          this.currentPlayer = this.model.playerTwo;
-          //opponent does their move;
-          // ...
-          this.opponentAttackAlgorithm();
-
-          this.currentPlayer = this.model.playerOne;
+          if (this.winCheck === false) {
+            this.currentPlayer = this.model.playerTwo;
+            //opponent does their move;
+            // ...
+            this.opponentAttackAlgorithm().then(() => {
+              this.currentPlayer = this.model.playerOne;
+            });
+          }
         }
       }
     });
@@ -160,31 +166,155 @@ export class Controller {
   }
 
   opponentAttackAlgorithm() {
-    let attack = new Promise((resolve) => {
+    if (this.secondProtocol === true) {
+      return this.continueSmartAttack(this.determineDirection(this.smartNode));
+    } else if (this.shipFirstFound.length > 0) {
+      return this.smartAttack();
+    } else {
+      return this.opponentRandomAttack();
+    }
+  }
+
+  async opponentRandomAttack() {
+    let attackPromise = new Promise((resolve) => {
       setTimeout(() => {
         // initially, randomly select square to find ship:
         let randIndex = this.getRandomIntInclusive(0, this.model.playerTwo.gameBoard.possibleOppAttacks.length - 1);
 
         let attackCoords = this.model.playerTwo.gameBoard.possibleOppAttacks[randIndex];
         this.model.playerTwo.gameBoard.possibleOppAttacks.splice(randIndex, 1);
-        console.log(this.model.playerTwo.gameBoard.possibleOppAttacks);
 
         let attack = this.model.playerOne.gameBoard.receiveAttack(attackCoords);
 
         // change color:
-        this.changePlayerOneColor(attackCoords);
-        resolve(attack);
-
+        resolve([attack, attackCoords]);
       }, 1500);
     });
-    attack.then((val) => {
-        this.helpText.textContent = (val === "hit") ? "The opponent hits!":"The opponent misses!";
-    });
+
+    const val = await attackPromise;
+
+    if (val[0] === "hit!") {
+      this.winUpdate(this.model.playerTwo);
+      this.helpText.textContent = "The opponent hits!";
+      this.changePlayerOneColor(val[1], "#39FF14");
+      this.shipFirstFound = val[1];
+      this.model.playerTwo.possibleAttacksQ = this.possibleAttacks(val[1]);
+    } else {
+      this.helpText.textContent = "The opponent misses!";
+      this.changePlayerOneColor(val[1], "#FF0000");
+    }
   }
 
-  changePlayerOneColor(coords) {
+  async smartAttack() {
+    if (this.model.playerTwo.possibleAttacksQ.length > 0) {
+      let attackPromise = new Promise((resolve) => {
+        setTimeout(() => {
+          let attackCoords = this.model.playerTwo.possibleAttacksQ.shift();
+          let attack = this.model.playerOne.gameBoard.receiveAttack(attackCoords);
+          console.log("Subsequent hit: " + attackCoords);
+          console.log(this.model.playerTwo.possibleAttacksQ);
+
+          resolve([attack, attackCoords]);
+        }, 1500);
+      });
+
+      const val = await attackPromise;
+
+      if (val[0] === "hit!") {
+        this.changePlayerOneColor(val[1], "#39FF14");
+        this.helpText.textContent = "The opponent hits!";
+        this.changePlayerOneColor(val[1], "#39FF14");
+        this.secondProtocol = true;
+        this.smartNode = new Node(val[1]);
+        this.smartNode.prevAttack = new Node(this.shipFirstFound);
+      } else if (val[0] === "miss!") {
+        this.changePlayerOneColor(val[1], "#FF0000");
+      }
+    } else {
+      return;
+    }
+  }
+
+  async continueSmartAttack(direction) {
+    if (direction === "up") {
+    }
+    if (direction === "down") {
+    }
+    if (direction === "left") {
+    }
+    if (direction === "right") {
+    }
+  }
+
+  determineDirection(node) {
+    let xSum = this.smartNode.currAttack[0] - this.smartNode.prevAttack[1];
+    let ySum = this.smartNode.currAttack[1] - this.smartNode.prevAttack[1];
+
+    if (xSum > 0) {
+      return "right";
+    } else if (xSum < 0) {
+      return "left";
+    } else if (ySum > 0) {
+      return "up";
+    } else if (ySum < 0) {
+      return "down";
+    }
+  }
+
+  possibleAttacks(coords) {
+    let q = [];
+    let possibleMoves = [
+      [0, 1],
+      [0, -1],
+      [1, 0],
+      [-1, 0],
+    ];
+
+    for (let move of possibleMoves) {
+      let newCoords = [coords[0] + move[0], coords[1] + move[1]];
+      console.log(newCoords);
+      let alreadyHit = this.model.playerOne.gameBoard.includesCoordinates(newCoords);
+      let outOfBounds = this.outOfBoundsCheck(newCoords);
+      if (!alreadyHit && !outOfBounds) {
+        q.push(newCoords);
+      } else {
+        console.log(alreadyHit);
+      }
+    }
+    return q;
+  }
+
+  changePlayerOneColor(coords, color) {
     let squareDiv = document.querySelector(`.grid-square[data-x = "${coords[0]}"][data-y = "${coords[1]}"]`);
-    console.log(squareDiv);
-    squareDiv.style.backgroundColor = "#FF0000";
+    squareDiv.style.backgroundColor = color;
+  }
+
+  winUpdate(player) {
+    if (player === this.model.playerOne) {
+      if (this.model.playerTwo.gameBoard.allShipsSunk()) {
+        this.helpText.textContent = "YOU WIN!!!";
+        this.winCheck = true;
+      }
+    } else if (player === this.model.playerTwo) {
+      if (this.model.playerOne.gameBoard.allShipsSunk()) {
+        this.helpText.textContent = "THE OPPONENT WON!!!";
+        this.winCheck = true;
+      }
+    }
+  }
+
+  outOfBoundsCheck(coords) {
+    if (coords[0] < 0 || coords[0] > 9 || coords[1] > 9 || coords[1] < 0) return true;
+    return false;
+  }
+}
+
+class Node {
+  prevAttack;
+  currAttack;
+
+  constructor(attack) {
+    this.currAttack = attack;
+    this.prevAttack = null;
   }
 }
