@@ -46,9 +46,15 @@ h1 {
     grid-column-start: 1;
     grid-column-end: 11;
     grid-row-start: 1;
-    grid-row-end: 3;
+    grid-row-end: 2;
     text-align: center;
     text-shadow: 1px 1px #F27DFD;
+}
+
+#player-1-ship-count, #player-2-ship-count{
+    grid-row: 2/4;
+    grid-column: 1/11;
+    text-align: center;
 }
 
 .grid-square,

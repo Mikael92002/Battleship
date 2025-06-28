@@ -12,6 +12,8 @@ export class Controller {
   currentPlayer;
   winCheck;
   aiState;
+  playerOneShipCount;
+  playerTwoShipCount;
 
   constructor(model, view) {
     this.view = view;
@@ -22,6 +24,8 @@ export class Controller {
 
     this.playerOneGrid = document.querySelector("#player-1-grid");
     this.playerTwoGrid = document.querySelector("#player-2-grid");
+    this.playerOneShipCount = document.querySelector("#player-1-ship-count");
+    this.playerTwoShipCount = document.querySelector("#player-2-ship-count");
     this.helpText = document.querySelector("#help-text");
 
     this.playerOneGrid.addEventListener("mouseover", (event) => {
@@ -72,6 +76,7 @@ export class Controller {
 
           if (attack === "hit!") {
             this.helpText.textContent = "You hit the opponent's ship!";
+            this.playerTwoShipCount.textContent = "Ship Count: " + this.model.playerTwo.gameBoard.remainingShips();
             event.target.style.backgroundColor = "#39FF14";
             this.winUpdate(this.model.playerOne);
           }
@@ -89,6 +94,10 @@ export class Controller {
 
             this.aiState.getNextAttack().then((returnArr) => {
               this.currentPlayer = this.model.playerOne;
+              this.updatePlayerOneUIUponAttack(returnArr);
+              console.log("p1: " + this.model.playerOne.gameBoard.remainingShips());
+              console.log("attackCoords: " + returnArr[1]);
+              // console.log("p2: " + this.playerTwo.gameBoard.remainingShips());
             });
           }
         }
@@ -123,6 +132,26 @@ export class Controller {
       this.model.playerOne.gameBoard.placeShip(poppedShip, activeButtonText, coords);
       this.view.placeShipClick(poppedShip.getLength(), target, activeButtonText, "#e900ff");
       this.view.resetSquareColor();
+    }
+  }
+
+  updatePlayerOneUIUponAttack(returnArr) {
+    const attack = returnArr[0];
+    const attackCoords = returnArr[1];
+
+    switch (attack) {
+      case "hit!": {
+        this.helpText.textContent = "The opponent hits!";
+        this.playerOneShipCount.textContent = "Ship Count: " + this.model.playerOne.gameBoard.remainingShips();
+        this.winUpdate(this.model.playerTwo);
+        this.changePlayerOneColor(attackCoords, "#39FF14");
+        break;
+      }
+      case "miss!": {
+        this.helpText.textContent = "The opponent misses!";
+        this.changePlayerOneColor(attackCoords, "#FF0000");
+        break;
+      }
     }
   }
 
@@ -281,8 +310,8 @@ export class Controller {
     }
   }
 
-  outOfBoundsCheck(coords) {
-    if (coords[0] < 0 || coords[0] > 9 || coords[1] > 9 || coords[1] < 0) return true;
-    return false;
-  }
+  // outOfBoundsCheck(coords) {
+  //   if (coords[0] < 0 || coords[0] > 9 || coords[1] > 9 || coords[1] < 0) return true;
+  //   return false;
+  // }
 }
