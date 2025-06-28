@@ -37,7 +37,6 @@ export class AIState {
   }
 
   async randomAttack() {
-    console.log("random attacking");
     let attackPromise = new Promise((resolve) => {
       setTimeout(() => {
         let randIndex = this.getRandomIntInclusive(0, this.validMovesGrid.length - 1);
@@ -64,7 +63,6 @@ export class AIState {
   }
 
   async seekDirectionAttack() {
-    console.log("seeking direction");
     if (this.Q.length > 0) {
       const remainingShipsInit = this.playerOne.gameBoard.remainingShips();
 
@@ -111,7 +109,6 @@ export class AIState {
   }
 
   async continueSmartAttack() {
-    console.log("smart attacking");
     const remainingShipsInit = this.playerOne.gameBoard.remainingShips();
     // coord validation should be the first thing done:
     let attackCoords = this.nextAttack();

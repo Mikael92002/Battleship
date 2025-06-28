@@ -95,9 +95,6 @@ export class Controller {
             this.aiState.getNextAttack().then((returnArr) => {
               this.currentPlayer = this.model.playerOne;
               this.updatePlayerOneUIUponAttack(returnArr);
-              console.log("p1: " + this.model.playerOne.gameBoard.remainingShips());
-              console.log("attackCoords: " + returnArr[1]);
-              // console.log("p2: " + this.playerTwo.gameBoard.remainingShips());
             });
           }
         }
@@ -196,100 +193,6 @@ export class Controller {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  // opponentAttackAlgorithm() {
-  //   if (this.secondProtocol === true) {
-  //     return this.continueSmartAttack(this.determineDirection(this.smartNode));
-  //   } else if (this.shipFirstFound.length > 0) {
-  //     return this.smartAttack();
-  //   } else {
-  //     return this.opponentRandomAttack();
-  //   }
-  // }
-
-  // async opponentRandomAttack() {
-  //   let attackPromise = new Promise((resolve) => {
-  //     setTimeout(() => {
-  //       // initially, randomly select square to find ship:
-  //       let randIndex = this.getRandomIntInclusive(0, this.model.playerTwo.gameBoard.possibleOppAttacks.length - 1);
-
-  //       let attackCoords = this.model.playerTwo.gameBoard.possibleOppAttacks[randIndex];
-  //       this.model.playerTwo.gameBoard.possibleOppAttacks.splice(randIndex, 1);
-
-  //       let attack = this.model.playerOne.gameBoard.receiveAttack(attackCoords);
-
-  //       resolve([attack, attackCoords]);
-  //     }, 1500);
-  //   });
-
-  //   const val = await attackPromise;
-
-  //   if (val[0] === "hit!") {
-  //     this.winUpdate(this.model.playerTwo);
-  //     this.helpText.textContent = "The opponent hits!";
-  //     this.changePlayerOneColor(val[1], "#39FF14");
-  //     this.shipFirstFound = val[1];
-  //     this.model.playerTwo.possibleAttacksQ = this.possibleAttacks(val[1]);
-  //   } else {
-  //     this.helpText.textContent = "The opponent misses!";
-  //     this.changePlayerOneColor(val[1], "#FF0000");
-  //   }
-  // }
-
-  // async smartAttack() {
-  //   if (this.model.playerTwo.possibleAttacksQ.length > 0) {
-  //     let attackPromise = new Promise((resolve) => {
-  //       setTimeout(() => {
-  //         let attackCoords = this.model.playerTwo.possibleAttacksQ.shift();
-  //         let attack = this.model.playerOne.gameBoard.receiveAttack(attackCoords);
-  //         console.log("Subsequent hit: " + attackCoords);
-  //         console.log(this.model.playerTwo.possibleAttacksQ);
-
-  //         resolve([attack, attackCoords]);
-  //       }, 1500);
-  //     });
-
-  //     const val = await attackPromise;
-
-  //     if (val[0] === "hit!") {
-  //       this.changePlayerOneColor(val[1], "#39FF14");
-  //       this.helpText.textContent = "The opponent hits!";
-  //       this.changePlayerOneColor(val[1], "#39FF14");
-  //       this.secondProtocol = true;
-  //       this.smartNode = new Node(val[1]);
-  //       this.smartNode.prevAttack = new Node(this.shipFirstFound);
-  //     } else if (val[0] === "miss!") {
-  //       this.changePlayerOneColor(val[1], "#FF0000");
-  //     }
-  //   } else {
-  //     return;
-  //   }
-  // }
-
-  // async continueSmartAttack(direction) {
-  //   if (direction === "up") {
-  //   }
-  //   if (direction === "down") {
-  //   }
-  //   if (direction === "left") {
-  //   }
-  //   if (direction === "right") {
-  //   }
-  // }
-
-  // determineDirection(node) {
-  //   let xSum = this.smartNode.currAttack[0] - this.smartNode.prevAttack[1];
-  //   let ySum = this.smartNode.currAttack[1] - this.smartNode.prevAttack[1];
-
-  //   if (xSum > 0) {
-  //     return "right";
-  //   } else if (xSum < 0) {
-  //     return "left";
-  //   } else if (ySum > 0) {
-  //     return "up";
-  //   } else if (ySum < 0) {
-  //     return "down";
-  //   }
-  // }
 
   changePlayerOneColor(coords, color) {
     let squareDiv = document.querySelector(`.grid-square[data-x = "${coords[0]}"][data-y = "${coords[1]}"]`);
@@ -310,8 +213,4 @@ export class Controller {
     }
   }
 
-  // outOfBoundsCheck(coords) {
-  //   if (coords[0] < 0 || coords[0] > 9 || coords[1] > 9 || coords[1] < 0) return true;
-  //   return false;
-  // }
 }
