@@ -10,17 +10,12 @@ export class Controller {
   helpText;
   currentPlayer;
   winCheck;
-  shipFirstFound;
-  smartNode;
-  secondProtocol;
 
   constructor(model, view) {
     this.view = view;
     this.model = model;
     this.currentPlayer = null;
     this.winCheck = false;
-    this.shipFirstFound = [];
-    this.smartNode = null;
 
     this.playerOneGrid = document.querySelector("#player-1-grid");
     this.playerTwoGrid = document.querySelector("#player-2-grid");
@@ -186,7 +181,6 @@ export class Controller {
 
         let attack = this.model.playerOne.gameBoard.receiveAttack(attackCoords);
 
-        // change color:
         resolve([attack, attackCoords]);
       }, 1500);
     });
@@ -261,29 +255,6 @@ export class Controller {
     }
   }
 
-  possibleAttacks(coords) {
-    let q = [];
-    let possibleMoves = [
-      [0, 1],
-      [0, -1],
-      [1, 0],
-      [-1, 0],
-    ];
-
-    for (let move of possibleMoves) {
-      let newCoords = [coords[0] + move[0], coords[1] + move[1]];
-      console.log(newCoords);
-      let alreadyHit = this.model.playerOne.gameBoard.includesCoordinates(newCoords);
-      let outOfBounds = this.outOfBoundsCheck(newCoords);
-      if (!alreadyHit && !outOfBounds) {
-        q.push(newCoords);
-      } else {
-        console.log(alreadyHit);
-      }
-    }
-    return q;
-  }
-
   changePlayerOneColor(coords, color) {
     let squareDiv = document.querySelector(`.grid-square[data-x = "${coords[0]}"][data-y = "${coords[1]}"]`);
     squareDiv.style.backgroundColor = color;
@@ -306,15 +277,5 @@ export class Controller {
   outOfBoundsCheck(coords) {
     if (coords[0] < 0 || coords[0] > 9 || coords[1] > 9 || coords[1] < 0) return true;
     return false;
-  }
-}
-
-class Node {
-  prevAttack;
-  currAttack;
-
-  constructor(attack) {
-    this.currAttack = attack;
-    this.prevAttack = null;
   }
 }
