@@ -1,5 +1,3 @@
-import { Player } from "./Player";
-
 export class AIState {
   prevCoords;
   direction;
@@ -18,7 +16,7 @@ export class AIState {
   constructor(playerOne, playerTwo) {
     this.initShipPos = null;
     this.direction = null;
-    this.allMovesGrid = [];
+    this.validMovesGrid = [];
     this.playerTwo = playerTwo;
     this.playerOne = playerOne;
     this.Q = [];
@@ -31,10 +29,16 @@ export class AIState {
     }
   }
 
+  async getNextAttack() {
+    if (this.direction !== null) return this.continueSmartAttack();
+    else if (this.Q.length > 0) return this.seekDirectionAttack();
+    else return this.randomAttack();
+  }
+
   async randomAttack() {
     let attackPromise = new Promise((resolve) => {
       setTimeout(() => {
-        let randIndex = this.getRandomIntInclusive(0, this.allMovesGrid.length - 1);
+        let randIndex = this.getRandomIntInclusive(0, this.validMovesGrid.length - 1);
 
         let attackCoords = this.playerTwo.gameBoard.validMovesGrid.splice(randIndex, 1);
         let attack = this.playerOne.gameBoard.receiveAttack(attackCoords);
@@ -46,40 +50,45 @@ export class AIState {
     const resArray = await attackPromise;
 
     //if "hit!"
-    // call win, update helpText, changePlayerOneColor
+    // call winCheck, update helpText, changePlayerOneColor
     if (resArray[0] === "hit!") {
       this.initShipPos = resArray[1];
       //generate future moves Q:
       this.Q = this.possibleAttacks(resArray[1]);
     } else if (resArray[0] === "miss!") {
-      //...
+      //... do in controller with returned resArray
     }
     return resArray;
   }
 
   async seekDirectionAttack() {
     // remove this length check, use in controller class:
-    if (this.Q.length > 0) {
-      const remainingShipsInit = this.playerOne.gameBoard.remainingShips();
-      let attackPromise = new Promise((resolve) => {
-        setTimeout(() => {
-          let attackCoords = this.Q.shift();
-          let attack = this.playerOne.receiveAttack(attackCoords);
+    // if (this.Q.length > 0) {
+    const remainingShipsInit = this.playerOne.gameBoard.remainingShips();
+    let attackPromise = new Promise((resolve) => {
+      setTimeout(() => {
+        let attackCoords = this.Q.shift();
+        let attack = this.playerOne.receiveAttack(attackCoords);
 
-          resolve([attack, attackCoords]);
-        }, 1500);
-      });
+        resolve([attack, attackCoords]);
+      }, 1500);
+    });
 
-      const resArray = await attackPromise;
+    const resArray = await attackPromise;
 
-      if (resArray[0] === "hit!" && remainingShipsInit === this.playerOne.remainingShips) {
-        this.prevCoords = this.initShipPos;
-        this.direction = this.findDirection(resArray[1]);
-        this.prevCoords = resArray[1];
-      } else {
-        this.Q = [];
-      }
-    } 
+    if (resArray[0] === "hit!" && remainingShipsInit === this.playerOne.remainingShips()) {
+      this.prevCoords = this.initShipPos;
+      this.direction = this.findDirection(resArray[1]);
+      this.prevCoords = resArray[1];
+    } else {
+      this.Q = [];
+      this.initShipPos = null;
+      this.prevCoords = null;
+    }
+
+    return resArray;
+
+    // Do in controller:
     // else {
     //   return this.randomAttack();
     // }
@@ -102,14 +111,16 @@ export class AIState {
       }, 1500);
     });
 
-    if(remainingShipsInit !== this.playerOne.remainingShips){
-        this.direction = null;
-        this.Q = [];
+    const resArray = await attackPromise;
+
+    if (remainingShipsInit !== this.playerOne.remainingShips()) {
+      this.direction = null;
+      this.Q = [];
+      this.initShipPos = null;
+      this.prevCoords = null;
     }
 
-    return attackPromise;
-
-    // NEED TO CHECK IF ATTACK DESTROYED SHIP. IF YES, GO BACK TO RAND ATTACKING
+    return resArray;
   }
 
   possibleAttacks(coords) {
@@ -199,6 +210,4 @@ export class AIState {
     if (coords[0] < 0 || coords[0] > 9 || coords[1] > 9 || coords[1] < 0) return true;
     return false;
   }
-
-  // ADD OOB CHECK
 }
