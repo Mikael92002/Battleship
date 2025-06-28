@@ -51,8 +51,7 @@ export class AIState {
 
     const resArray = await attackPromise;
 
-    //if "hit!"
-    // call winCheck, update helpText, changePlayerOneColor
+
     if (resArray[0] === "hit!") {
       this.initShipPos = resArray[1];
       //generate future moves Q:
@@ -66,17 +65,6 @@ export class AIState {
     if (this.Q.length > 0) {
       const remainingShipsInit = this.playerOne.gameBoard.remainingShips();
 
-      //   let attackCoords = this.Q.shift();
-      //   let coordValidation = this.coordValidation(attackCoords);
-
-      //   while (coordValidation === false && this.Q.length > 0) {
-      //     attackCoords = this.Q.shift();
-      //     coordValidation = this.coordValidation(attackCoords);
-      //   }
-      //   if (coordValidation === false && this.Q.length <= 0) {
-      //     return this.randomAttack();
-      //   }
-
       let attackPromise = new Promise((resolve) => {
         setTimeout(() => {
           let attackCoords = this.Q.shift();
@@ -86,7 +74,6 @@ export class AIState {
             coordValidation = this.coordValidation(attackCoords);
           }
 
-          //   if (this.Q.length <= 0) return this.randomAttack();
           let attack = this.playerOne.gameBoard.receiveAttack(attackCoords);
           this.removeFromValidMovesGrid(attackCoords);
 
@@ -115,8 +102,6 @@ export class AIState {
     const coordValidation = this.coordValidation(attackCoords);
 
     if (!coordValidation) {
-      //   this.flipDirection(this.direction);
-      //   attackCoords = this.nextAttack()
       this.direction = null;
 
       return this.seekDirectionAttack();
@@ -140,7 +125,6 @@ export class AIState {
       this.initShipPos = null;
       this.prevCoords = null;
     } else if (remainingShipsInit === remainingShipsPost && resArray[0] === "miss!") {
-      // let's see bout this:
       this.direction = null;
       return this.seekDirectionAttack();
     }

@@ -86,11 +86,7 @@ export class Controller {
           }
           if (this.winCheck === false) {
             this.currentPlayer = this.model.playerTwo;
-            //opponent does their move;
-            // ...
-            // this.opponentAttackAlgorithm().then(() => {
-            //   this.currentPlayer = this.model.playerOne;
-            // });
+            
 
             this.aiState.getNextAttack().then((returnArr) => {
               this.currentPlayer = this.model.playerOne;
