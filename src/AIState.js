@@ -117,6 +117,8 @@ export class AIState {
     if (coordValidation !== AIState.validationStatus.VALID) {
       if (coordValidation === AIState.validationStatus.OOB || coordValidation === AIState.validationStatus.HIT) {
         if (this.directionFlipped) {
+          this.directionFlipped = false;
+          this.direction = null;
           return this.seekDirectionAttack();
         } else {
           this.flipDirection();
@@ -146,12 +148,13 @@ export class AIState {
         this.initShipPosArr.push(resArray[1]);
       }
       this.prevCoords = resArray[1];
-    } else if (resArray[0] === "miss!" && !this.directionFlipped) {
-      this.directionFlipped = true;
-      this.flipDirection();
-    } else if (resArray[0] === "miss!" && this.directionFlipped) {
-      this.directionFlipped = false;
-      this.setPrevToInitShipPos();
+    } else if (resArray[0] === "miss!") {
+      if (!this.directionFlipped) {
+        this.flipDirection();
+      } else if (this.directionFlipped) {
+        this.directionFlipped = false;
+        this.direction = null;
+      }
     }
     if (currShip.isSunk()) {
       this.direction = null;
