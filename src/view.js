@@ -64,8 +64,8 @@ export class View {
     }
   }
 
-  resetSquareColor() {
-    let allSquares = document.querySelectorAll(".grid-square");
+  resetSquareColor(squareClass) {
+    let allSquares = document.querySelectorAll(squareClass);
 
     for (let square of allSquares) {
       square.style.borderColor = "#F27DFD";

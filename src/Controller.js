@@ -40,7 +40,9 @@ export class Controller {
       }
     });
 
-    this.playerOneGrid.addEventListener("mouseout", this.view.resetSquareColor);
+    this.playerOneGrid.addEventListener("mouseout", () => {
+      this.view.resetSquareColor(".grid-square");
+    });
 
     this.playerOneGrid.addEventListener("click", (event) => {
       if (this.model.playerOne.shipArrSize() > 0) {
@@ -79,10 +81,12 @@ export class Controller {
             this.playerTwoShipCount.textContent = "Ship Count: " + this.model.playerTwo.gameBoard.remainingShips();
             event.target.style.backgroundColor = "#39FF14";
             this.winUpdate(this.model.playerOne);
+            this.view.resetSquareColor(".enemy-grid-square")
           }
           if (attack === "miss!") {
             this.helpText.textContent = "You missed the opponent's ships!";
             event.target.style.backgroundColor = "#FF0000";
+            this.view.resetSquareColor(".enemy-grid-square");
           }
           if (this.winCheck === false) {
             this.currentPlayer = this.model.playerTwo;
@@ -94,6 +98,26 @@ export class Controller {
           }
         }
       }
+    });
+
+    this.playerTwoGrid.addEventListener("mouseover", (event) => {
+      if (this.currentPlayer === this.model.playerOne && this.model.playerTwo.shipArrSize() <= 0 && this.winCheck === false) {
+        if (event.target.classList.contains("enemy-grid-square")) {
+          let xCoord = Number(event.target.getAttribute("data-opp-x"));
+          let yCoord = Number(event.target.getAttribute("data-opp-y"));
+
+          const coordValidation = this.model.playerTwo.gameBoard.includesCoordinates([xCoord, yCoord]);
+          if (!coordValidation) {
+            event.target.style.borderColor = "#39FF14";
+          } else {
+            event.target.style.borderColor = "#FF0000";
+          }
+        }
+      }
+    });
+
+    this.playerTwoGrid.addEventListener("mouseout", () => {
+      this.view.resetSquareColor(".enemy-grid-square");
     });
   }
 
@@ -123,7 +147,7 @@ export class Controller {
 
       this.model.playerOne.gameBoard.placeShip(poppedShip, activeButtonText, coords);
       this.view.placeShipClick(poppedShip.getLength(), target, activeButtonText, "#e900ff");
-      this.view.resetSquareColor();
+      this.view.resetSquareColor(".grid-square");
     }
   }
 

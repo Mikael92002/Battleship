@@ -7,9 +7,16 @@ export class AIState {
   playerTwo;
   directionFlipped;
 
+  static validationStatus = Object.freeze({
+    VALID: "VALID",
+    HIT: "HIT",
+    HIT_WITH_SHIP: "HIT_WITH_SHIP",
+    OOB: "OOB",
+  });
+
   // To implement the class in Controller, observe changes on the following markers:
 
-  // randomAttack only when this.Q.length <= 0
+  // randomAttack only when this.initShipPosArr.length <= 0
   // seekDirectionAttack only when this.Q.length > 0
   // continueSmartAttack only when this.direction !== null
 
@@ -19,7 +26,6 @@ export class AIState {
     this.validMovesGrid = [];
     this.playerTwo = playerTwo;
     this.playerOne = playerOne;
-    //this.Q = [];
     this.prevCoords = null;
     this.directionFlipped = false;
 
@@ -67,7 +73,7 @@ export class AIState {
 
   async seekDirectionAttack() {
     const currShip = this.initShipPosArr[0][2];
-
+    this.setPrevToInitShipPos();
     let Q = this.possibleAttacks(this.prevCoords);
     if (Q.length <= 0) {
       return this.randomAttack();
@@ -108,14 +114,19 @@ export class AIState {
     let attackCoords = this.nextAttack();
     const coordValidation = this.coordValidation(attackCoords);
 
-    if (!coordValidation && !this.directionFlipped) {
-      this.directionFlipped = true;
-      this.flipDirection();
-      return this.continueSmartAttack();
-    } else if (!coordValidation && this.directionFlipped) {
-      this.setPrevToInitShipPos();
-      this.directionFlipped = false;
-      return this.seekDirectionAttack();
+    if (coordValidation !== AIState.validationStatus.VALID) {
+      if (coordValidation === AIState.validationStatus.OOB || coordValidation === AIState.validationStatus.HIT) {
+        if (this.directionFlipped) {
+          return this.seekDirectionAttack();
+        } else {
+          this.flipDirection();
+          return this.continueSmartAttack();
+        }
+      }
+      if (coordValidation === AIState.validationStatus.HIT_WITH_SHIP) {
+        this.prevCoords = attackCoords;
+        return this.continueSmartAttack();
+      }
     }
 
     let attackPromise = new Promise((resolve) => {
@@ -168,7 +179,7 @@ export class AIState {
 
       let coordValidation = this.coordValidation(newCoords);
 
-      if (coordValidation) {
+      if (coordValidation === AIState.validationStatus.VALID) {
         q.push(newCoords);
       }
     }
@@ -185,9 +196,19 @@ export class AIState {
   }
 
   coordValidation(coords) {
-    let alreadyHit = this.playerOne.gameBoard.includesCoordinates(coords);
     let outOfBounds = this.outOfBoundsCheck(coords);
-    return !alreadyHit && !outOfBounds;
+    if (outOfBounds) {
+      return AIState.validationStatus.OOB;
+    }
+    let alreadyHit = this.playerOne.gameBoard.includesCoordinates(coords);
+    if (alreadyHit) {
+      if (this.playerOne.gameBoard.getShipAtCoords(coords) !== null) {
+        return AIState.validationStatus.HIT_WITH_SHIP;
+      } else {
+        return AIState.validationStatus.HIT;
+      }
+    }
+    return AIState.validationStatus.VALID;
   }
 
   findDirection(currCoords) {
@@ -223,6 +244,7 @@ export class AIState {
     } else if (this.direction === 3) {
       this.direction = 2;
     }
+    this.directionFlipped = true;
     this.setPrevToInitShipPos();
   }
 

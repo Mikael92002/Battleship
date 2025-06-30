@@ -1,2 +1,2 @@
 # Battleship
-A take on the classic Battleship game implementing a rudimentary AI opponent.
+A take on the classic Battleship game implementing a smart AI opponent.
