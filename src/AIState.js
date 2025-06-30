@@ -5,7 +5,7 @@ export class AIState {
   validMovesGrid;
   playerOne;
   playerTwo;
-  Q;
+  //Q;
   directionFlipped;
 
   // To implement the class in Controller, observe changes on the following markers:
@@ -15,7 +15,7 @@ export class AIState {
   // continueSmartAttack only when this.direction !== null
 
   constructor(playerOne, playerTwo) {
-    this.initShipPos = null;
+    this.initShipPosArr = [];
     this.direction = null;
     this.validMovesGrid = [];
     this.playerTwo = playerTwo;
@@ -37,12 +37,13 @@ export class AIState {
   }
 
   async randomAttack() {
+    let randIndex = this.getRandomIntInclusive(0, this.validMovesGrid.length - 1);
+
+    let attackCoords = this.validMovesGrid[randIndex];
+    this.validMovesGrid.splice(randIndex, 1);
+
     let attackPromise = new Promise((resolve) => {
       setTimeout(() => {
-        let randIndex = this.getRandomIntInclusive(0, this.validMovesGrid.length - 1);
-
-        let attackCoords = this.validMovesGrid[randIndex];
-        this.validMovesGrid.splice(randIndex, 1);
         let attack = this.playerOne.gameBoard.receiveAttack(attackCoords);
 
         resolve([attack, attackCoords]);
@@ -51,48 +52,44 @@ export class AIState {
 
     const resArray = await attackPromise;
 
-
     if (resArray[0] === "hit!") {
-      this.initShipPos = resArray[1];
-      //generate future moves Q:
-      this.Q = this.possibleAttacks(resArray[1]);
+      const ship = this.playerOne.gameBoard.getAtCoords(resArray[1]);
+      this.initShipPosArr.push(resArray[1].push(ship));
+      //assign as previous coords:
+      this.prevCoords = resArray[1];
     }
 
     return resArray;
   }
 
   async seekDirectionAttack() {
-    if (this.Q.length > 0) {
-      const remainingShipsInit = this.playerOne.gameBoard.remainingShips();
+    const remainingShipsInit = this.playerOne.gameBoard.remainingShips();
 
-      let attackPromise = new Promise((resolve) => {
-        setTimeout(() => {
-          let attackCoords = this.Q.shift();
-          let coordValidation = this.coordValidation(attackCoords);
-          while (coordValidation === false && the.Q.length > 0) {
-            attackCoords = this.Q.shift();
-            coordValidation = this.coordValidation(attackCoords);
-          }
+    let attackPromise = new Promise((resolve) => {
+      setTimeout(() => {
+        let attackCoords = this.Q.shift();
+        let coordValidation = this.coordValidation(attackCoords);
+        while (coordValidation === false && the.Q.length > 0) {
+          attackCoords = this.Q.shift();
+          coordValidation = this.coordValidation(attackCoords);
+        }
 
-          let attack = this.playerOne.gameBoard.receiveAttack(attackCoords);
-          this.removeFromValidMovesGrid(attackCoords);
+        let attack = this.playerOne.gameBoard.receiveAttack(attackCoords);
+        this.removeFromValidMovesGrid(attackCoords);
 
-          resolve([attack, attackCoords]);
-        }, 1500);
-      });
+        resolve([attack, attackCoords]);
+      }, 1500);
+    });
 
-      const resArray = await attackPromise;
+    const resArray = await attackPromise;
 
-      if (resArray[0] === "hit!" && remainingShipsInit === this.playerOne.gameBoard.remainingShips()) {
-        this.prevCoords = this.initShipPos;
-        this.direction = this.findDirection(resArray[1]);
-        this.prevCoords = resArray[1];
-      }
-
-      return resArray;
-    } else {
-      return this.randomAttack();
+    if (resArray[0] === "hit!" && remainingShipsInit === this.playerOne.gameBoard.remainingShips()) {
+      this.prevCoords = this.initShipPos;
+      this.direction = this.findDirection(resArray[1]);
+      this.prevCoords = resArray[1];
     }
+
+    return resArray;
   }
 
   async continueSmartAttack() {
@@ -223,8 +220,6 @@ export class AIState {
       }
     }
   }
-
-  removeFromQIfFlipped() {}
 
   outOfBoundsCheck(coords) {
     if (coords[0] < 0 || coords[0] > 9 || coords[1] > 9 || coords[1] < 0) return true;

@@ -95,12 +95,14 @@ export class Gameboard {
     }
   }
 
+  getAtCoords(coords) {
+    const index = this.coordinatesToIndex(coords);
+    return this.#grid[index];
+  }
+
   includesCoordinates(coordinates) {
     for (let i = 0; i < this.#coordinatesHit.length; i++) {
-      if (
-        this.#coordinatesHit[i][0] == coordinates[0] &&
-        this.#coordinatesHit[i][1] == coordinates[1]
-      ) {
+      if (this.#coordinatesHit[i][0] == coordinates[0] && this.#coordinatesHit[i][1] == coordinates[1]) {
         return true;
       }
     }
@@ -152,10 +154,10 @@ export class Gameboard {
     return true;
   }
 
-  remainingShips(){
+  remainingShips() {
     let count = 0;
-    for(let ship of this.#shipArray){
-      if(!ship.isSunk()){
+    for (let ship of this.#shipArray) {
+      if (!ship.isSunk()) {
         count++;
       }
     }
