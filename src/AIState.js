@@ -1,11 +1,10 @@
 export class AIState {
   prevCoords;
   direction;
-  initShipPos;
+  initShipPosArr;
   validMovesGrid;
   playerOne;
   playerTwo;
-  //Q;
   directionFlipped;
 
   // To implement the class in Controller, observe changes on the following markers:
@@ -20,8 +19,9 @@ export class AIState {
     this.validMovesGrid = [];
     this.playerTwo = playerTwo;
     this.playerOne = playerOne;
-    this.Q = [];
+    //this.Q = [];
     this.prevCoords = null;
+    this.directionFlipped = false;
 
     for (let i = 0; i < 10; i++) {
       for (let j = 0; j < 10; j++) {
@@ -54,7 +54,10 @@ export class AIState {
 
     if (resArray[0] === "hit!") {
       const ship = this.playerOne.gameBoard.getAtCoords(resArray[1]);
-      this.initShipPosArr.push(resArray[1].push(ship));
+      if (!this.containsShip(ship)) {
+        resArray[1].push(ship);
+        this.initShipPosArr.push(resArray[1]);
+      }
       //assign as previous coords:
       this.prevCoords = resArray[1];
     }
@@ -63,17 +66,16 @@ export class AIState {
   }
 
   async seekDirectionAttack() {
-    const remainingShipsInit = this.playerOne.gameBoard.remainingShips();
+    const currShip = this.initShipPosArr[0][2];
+
+    let Q = this.possibleAttacks(this.prevCoords);
+    if (Q.length <= 0) {
+      return this.randomAttack();
+    }
+    let attackCoords = Q.shift();
 
     let attackPromise = new Promise((resolve) => {
       setTimeout(() => {
-        let attackCoords = this.Q.shift();
-        let coordValidation = this.coordValidation(attackCoords);
-        while (coordValidation === false && the.Q.length > 0) {
-          attackCoords = this.Q.shift();
-          coordValidation = this.coordValidation(attackCoords);
-        }
-
         let attack = this.playerOne.gameBoard.receiveAttack(attackCoords);
         this.removeFromValidMovesGrid(attackCoords);
 
@@ -83,24 +85,36 @@ export class AIState {
 
     const resArray = await attackPromise;
 
-    if (resArray[0] === "hit!" && remainingShipsInit === this.playerOne.gameBoard.remainingShips()) {
-      this.prevCoords = this.initShipPos;
+    if (resArray[0] === "hit!" && !currShip.isSunk()) {
       this.direction = this.findDirection(resArray[1]);
       this.prevCoords = resArray[1];
+      const ship = this.playerOne.gameBoard.getAtCoords(resArray[1]);
+      if (!this.containsShip(ship)) {
+        resArray[1].push(ship);
+        this.initShipPosArr.push(resArray[1]);
+      }
+    } else if (resArray[0] === "hit" && currShip.isSunk()) {
+      this.direction = null;
+      this.prevCoords = resArray[1];
+      this.initShipPosArr.shift();
     }
 
     return resArray;
   }
 
   async continueSmartAttack() {
-    const remainingShipsInit = this.playerOne.gameBoard.remainingShips();
+    const currShip = this.initShipPosArr[0][2];
     // coord validation should be the first thing done:
     let attackCoords = this.nextAttack();
     const coordValidation = this.coordValidation(attackCoords);
 
-    if (!coordValidation) {
-      this.direction = null;
-
+    if (!coordValidation && !this.directionFlipped) {
+      this.directionFlipped = true;
+      this.flipDirection();
+      return this.continueSmartAttack(true);
+    } else if (!coordValidation && this.directionFlipped) {
+      this.setPrevToInitShipPos();
+      this.directionFlipped = false;
       return this.seekDirectionAttack();
     }
 
@@ -114,16 +128,22 @@ export class AIState {
     });
 
     const resArray = await attackPromise;
-    const remainingShipsPost = this.playerOne.gameBoard.remainingShips();
 
-    if (remainingShipsInit !== remainingShipsPost) {
-      this.direction = null;
-      this.Q = [];
-      this.initShipPos = null;
-      this.prevCoords = null;
-    } else if (remainingShipsInit === remainingShipsPost && resArray[0] === "miss!") {
-      this.direction = null;
+    if (resArray[1] === "hit!") {
+      const ship = this.playerOne.gameBoard.getAtCoords(resArray[1]);
+      if (!this.containsShip(ship)) {
+        resArray[1].push(ship);
+        this.initShipPosArr.push(resArray[1]);
+      }
+    } else if (resArray[0] === "miss!") {
+      this.directionFlipped = false;
+      this.setPrevToInitShipPos();
       return this.seekDirectionAttack();
+    }
+    if (currShip.isSunk()) {
+      this.direction = null;
+      this.initShipPosArr.shift();
+      this.prevCoords = attackCoords;
     }
 
     return resArray;
@@ -190,7 +210,11 @@ export class AIState {
     } else if (this.direction === 3) {
       this.direction = 2;
     }
-    this.prevCoords = this.initShipPos;
+    this.setPrevToInitShipPos();
+  }
+
+  setPrevToInitShipPos() {
+    this.prevCoords = [this.initShipPosArr[0][0], this.initShipPosArr[0][1]];
   }
 
   nextAttack() {
@@ -219,6 +243,13 @@ export class AIState {
         return;
       }
     }
+  }
+
+  containsShip(ship) {
+    for (let arrShip of this.initShipPosArr) {
+      if (arrShip === ship) return true;
+    }
+    return false;
   }
 
   outOfBoundsCheck(coords) {
