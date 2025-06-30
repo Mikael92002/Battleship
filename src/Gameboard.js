@@ -71,7 +71,6 @@ export class Gameboard {
     let index = this.coordinatesToIndex(coordinates);
     if (this.#grid[index][2] instanceof Ship) {
       this.#grid[index][2].hit();
-      this.#grid[index][2] = null;
       this.#coordinatesHit.push(coordinates);
       return "hit!";
     } else {
@@ -95,9 +94,9 @@ export class Gameboard {
     }
   }
 
-  getAtCoords(coords) {
+  getShipAtCoords(coords) {
     const index = this.coordinatesToIndex(coords);
-    return this.#grid[index];
+    return this.#grid[index][2];
   }
 
   includesCoordinates(coordinates) {

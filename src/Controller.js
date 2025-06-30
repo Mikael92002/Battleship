@@ -1,6 +1,3 @@
-import { Player } from "./Player.js";
-import { view } from "./view.js";
-import { Ship } from "./Ship.js";
 import { AIState } from "./AIState.js";
 
 export class Controller {
@@ -14,6 +11,7 @@ export class Controller {
   aiState;
   playerOneShipCount;
   playerTwoShipCount;
+  orientationDiv;
 
   constructor(model, view) {
     this.view = view;
@@ -27,6 +25,7 @@ export class Controller {
     this.playerOneShipCount = document.querySelector("#player-1-ship-count");
     this.playerTwoShipCount = document.querySelector("#player-2-ship-count");
     this.helpText = document.querySelector("#help-text");
+    this.orientationDiv = document.querySelector("#orientation");
 
     this.playerOneGrid.addEventListener("mouseover", (event) => {
       if (this.model.playerOne.shipArrSize() > 0) {
@@ -57,6 +56,7 @@ export class Controller {
         }
       }
       if (this.model.playerOne.shipArrSize() === 0 && this.model.playerTwo.shipArrSize() > 0) {
+        this.orientationDiv.classList.add("start");
         this.helpText.textContent = "Waiting for Opponent to place ships...";
         let startGame = this.placePlayerTwoShips();
         startGame.then((val) => {
@@ -86,7 +86,6 @@ export class Controller {
           }
           if (this.winCheck === false) {
             this.currentPlayer = this.model.playerTwo;
-            
 
             this.aiState.getNextAttack().then((returnArr) => {
               this.currentPlayer = this.model.playerOne;
@@ -189,7 +188,6 @@ export class Controller {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-
   changePlayerOneColor(coords, color) {
     let squareDiv = document.querySelector(`.grid-square[data-x = "${coords[0]}"][data-y = "${coords[1]}"]`);
     squareDiv.style.backgroundColor = color;
@@ -208,5 +206,4 @@ export class Controller {
       }
     }
   }
-
 }

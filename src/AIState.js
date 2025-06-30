@@ -32,7 +32,7 @@ export class AIState {
 
   async getNextAttack() {
     if (this.direction !== null) return this.continueSmartAttack();
-    else if (this.Q.length > 0) return this.seekDirectionAttack();
+    else if (this.initShipPosArr.length > 0) return this.seekDirectionAttack();
     else return this.randomAttack();
   }
 
@@ -53,7 +53,7 @@ export class AIState {
     const resArray = await attackPromise;
 
     if (resArray[0] === "hit!") {
-      const ship = this.playerOne.gameBoard.getAtCoords(resArray[1]);
+      const ship = this.playerOne.gameBoard.getShipAtCoords(resArray[1]);
       if (!this.containsShip(ship)) {
         resArray[1].push(ship);
         this.initShipPosArr.push(resArray[1]);
@@ -88,13 +88,12 @@ export class AIState {
     if (resArray[0] === "hit!" && !currShip.isSunk()) {
       this.direction = this.findDirection(resArray[1]);
       this.prevCoords = resArray[1];
-      const ship = this.playerOne.gameBoard.getAtCoords(resArray[1]);
+      const ship = this.playerOne.gameBoard.getShipAtCoords(resArray[1]);
       if (!this.containsShip(ship)) {
         resArray[1].push(ship);
         this.initShipPosArr.push(resArray[1]);
       }
-    } else if (resArray[0] === "hit" && currShip.isSunk()) {
-      this.direction = null;
+    } else if (resArray[0] === "hit!" && currShip.isSunk()) {
       this.prevCoords = resArray[1];
       this.initShipPosArr.shift();
     }
@@ -104,6 +103,7 @@ export class AIState {
 
   async continueSmartAttack() {
     const currShip = this.initShipPosArr[0][2];
+
     // coord validation should be the first thing done:
     let attackCoords = this.nextAttack();
     const coordValidation = this.coordValidation(attackCoords);
@@ -111,7 +111,7 @@ export class AIState {
     if (!coordValidation && !this.directionFlipped) {
       this.directionFlipped = true;
       this.flipDirection();
-      return this.continueSmartAttack(true);
+      return this.continueSmartAttack();
     } else if (!coordValidation && this.directionFlipped) {
       this.setPrevToInitShipPos();
       this.directionFlipped = false;
@@ -121,7 +121,6 @@ export class AIState {
     let attackPromise = new Promise((resolve) => {
       setTimeout(() => {
         let attack = this.playerOne.gameBoard.receiveAttack(attackCoords);
-        this.prevCoords = attackCoords;
         this.removeFromValidMovesGrid(attackCoords);
         resolve([attack, attackCoords]);
       }, 1500);
@@ -129,19 +128,23 @@ export class AIState {
 
     const resArray = await attackPromise;
 
-    if (resArray[1] === "hit!") {
-      const ship = this.playerOne.gameBoard.getAtCoords(resArray[1]);
+    if (resArray[0] === "hit!") {
+      const ship = this.playerOne.gameBoard.getShipAtCoords(resArray[1]);
       if (!this.containsShip(ship)) {
         resArray[1].push(ship);
         this.initShipPosArr.push(resArray[1]);
       }
-    } else if (resArray[0] === "miss!") {
+      this.prevCoords = resArray[1];
+    } else if (resArray[0] === "miss!" && !this.directionFlipped) {
+      this.directionFlipped = true;
+      this.flipDirection();
+    } else if (resArray[0] === "miss!" && this.directionFlipped) {
       this.directionFlipped = false;
       this.setPrevToInitShipPos();
-      return this.seekDirectionAttack();
     }
     if (currShip.isSunk()) {
       this.direction = null;
+      this.directionFlipped = false;
       this.initShipPosArr.shift();
       this.prevCoords = attackCoords;
     }
@@ -158,6 +161,8 @@ export class AIState {
       [-1, 0],
     ];
 
+    this.shuffleArray(possibleMoves);
+
     for (let move of possibleMoves) {
       let newCoords = [coords[0] + move[0], coords[1] + move[1]];
 
@@ -170,10 +175,18 @@ export class AIState {
     return q;
   }
 
+  shuffleArray(arr) {
+    for (let i = 0; i < arr.length; i++) {
+      let rand = this.getRandomIntInclusive(i, arr.length - 1);
+      let temp = arr[i];
+      arr[i] = arr[rand];
+      arr[rand] = temp;
+    }
+  }
+
   coordValidation(coords) {
     let alreadyHit = this.playerOne.gameBoard.includesCoordinates(coords);
     let outOfBounds = this.outOfBoundsCheck(coords);
-
     return !alreadyHit && !outOfBounds;
   }
 
@@ -247,7 +260,7 @@ export class AIState {
 
   containsShip(ship) {
     for (let arrShip of this.initShipPosArr) {
-      if (arrShip === ship) return true;
+      if (arrShip[2] === ship) return true;
     }
     return false;
   }
