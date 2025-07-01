@@ -55,7 +55,6 @@ export class View {
         this.validXIndex(index, shipLength);
       }
     } else if (orientation === "y") {
-      let tempIndex = index;
       if (Math.floor(index / 10) - shipLength < -1) {
         this.invalidYIndex(index);
       } else {
