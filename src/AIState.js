@@ -43,7 +43,6 @@ export class AIState {
   }
 
   async randomAttack() {
-    console.log("randing")
     let randIndex = this.getRandomIntInclusive(0, this.validMovesGrid.length - 1);
 
     let attackCoords = this.validMovesGrid[randIndex];
@@ -73,7 +72,6 @@ export class AIState {
   }
 
   async seekDirectionAttack() {
-    console.log("seeking")
     const currShip = this.initShipPosArr[0][2];
     this.setPrevToInitShipPos();
     let Q = this.possibleAttacks(this.prevCoords);
@@ -110,7 +108,6 @@ export class AIState {
   }
 
   async continueSmartAttack() {
-    console.log("conting")
     const currShip = this.initShipPosArr[this.initShipPosArr.length-1][2];
 
     // coord validation should be the first thing done:
@@ -120,12 +117,10 @@ export class AIState {
     if (coordValidation !== AIState.validationStatus.VALID) {
       if (coordValidation === AIState.validationStatus.OOB || coordValidation === AIState.validationStatus.HIT) {
         if (this.directionFlipped) {
-          console.log("cont: OOB or HIT, returning seek")
           this.directionFlipped = false;
           this.direction = null;
           return this.seekDirectionAttack();
         } else {
-          console.log("cont: OOB or HIT, flipping dir, cont'ing")
           this.flipDirection();
           return this.continueSmartAttack();
         }
