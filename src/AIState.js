@@ -72,8 +72,8 @@ export class AIState {
   }
 
   async seekDirectionAttack() {
-    const currShip = this.initShipPosArr[0][2];
     this.setPrevToInitShipPos();
+
     let Q = this.possibleAttacks(this.prevCoords);
     if (Q.length <= 0) {
       return this.randomAttack();
@@ -91,7 +91,7 @@ export class AIState {
 
     const resArray = await attackPromise;
 
-    if (resArray[0] === "hit!" && !currShip.isSunk()) {
+    if (resArray[0] === "hit!") {
       this.direction = this.findDirection(resArray[1]);
       this.prevCoords = resArray[1];
       const ship = this.playerOne.gameBoard.getShipAtCoords(resArray[1]);
@@ -99,16 +99,15 @@ export class AIState {
         resArray[1].push(ship);
         this.initShipPosArr.push(resArray[1]);
       }
-    } else if (resArray[0] === "hit!" && currShip.isSunk()) {
-      this.prevCoords = resArray[1];
-      this.initShipPosArr.shift();
+      if (ship.isSunk()) {
+        this.removeShipFromArr(ship);
+      }
     }
 
     return resArray;
   }
 
   async continueSmartAttack() {
-    const currShip = this.initShipPosArr[this.initShipPosArr.length-1][2];
 
     // coord validation should be the first thing done:
     let attackCoords = this.nextAttack();
@@ -147,6 +146,12 @@ export class AIState {
         resArray[1].push(ship);
         this.initShipPosArr.push(resArray[1]);
       }
+      if (ship.isSunk()) {
+        this.removeShipFromArr(ship);
+        this.direction = null;
+        this.directionFlipped = false;
+        this.prevCoords = attackCoords;
+      }
       this.prevCoords = resArray[1];
     } else if (resArray[0] === "miss!") {
       if (!this.directionFlipped) {
@@ -155,12 +160,6 @@ export class AIState {
         this.directionFlipped = false;
         this.direction = null;
       }
-    }
-    if (currShip.isSunk()) {
-      this.direction = null;
-      this.directionFlipped = false;
-      this.initShipPosArr.pop();
-      this.prevCoords = attackCoords;
     }
 
     return resArray;
@@ -293,5 +292,15 @@ export class AIState {
   outOfBoundsCheck(coords) {
     if (coords[0] < 0 || coords[0] > 9 || coords[1] > 9 || coords[1] < 0) return true;
     return false;
+  }
+
+  removeShipFromArr(ship) {
+    for (let i = 0; i < this.initShipPosArr.length; i++) {
+      if (this.initShipPosArr[i][2] === ship) {
+        const shipRemoved = this.initShipPosArr.splice(i, 1);
+        console.log(shipRemoved)
+        return shipRemoved;
+      }
+    }
   }
 }
