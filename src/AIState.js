@@ -298,7 +298,6 @@ export class AIState {
     for (let i = 0; i < this.initShipPosArr.length; i++) {
       if (this.initShipPosArr[i][2] === ship) {
         const shipRemoved = this.initShipPosArr.splice(i, 1);
-        console.log(shipRemoved)
         return shipRemoved;
       }
     }
