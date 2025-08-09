@@ -101,6 +101,7 @@ export class AIState {
       }
       if (ship.isSunk()) {
         this.removeShipFromArr(ship);
+        this.direction = null;
       }
     }
 
@@ -108,7 +109,6 @@ export class AIState {
   }
 
   async continueSmartAttack() {
-
     // coord validation should be the first thing done:
     let attackCoords = this.nextAttack();
     const coordValidation = this.coordValidation(attackCoords);
