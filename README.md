@@ -16,7 +16,7 @@ A modern take on the classic **Battleship** game featuring a smart AI opponent. 
 ```bash
 git clone https://github.com/Mikael92002/Battleship.git
 ```
-**2.** Open ```index.html``` in your browser.
-**3.** Place your ships on the grid.
-**4.** Take turns attacking the opponent. The AI pauses before making their move to simulate human behavior.
+**2.** Open ```index.html``` in your browser.\
+**3.** Place your ships on the grid.\
+**4.** Take turns attacking the opponent. The AI pauses before making their move to simulate human behavior.\
 **5.** Win by sinking all enemy ships before they sink yours
